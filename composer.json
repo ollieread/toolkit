@@ -16,7 +16,7 @@
     "autoload": {
         "classmap": [],
         "psr-4": {
-            "Ollieslab\\Toolkit\\": "src/"
+            "Ollieread\\Toolkit\\": "src/"
         }
     }
 }
