@@ -77,25 +77,6 @@ class Repository
     }
 
     /**
-     * Create a new model.
-     *
-     * @param array $data
-     *
-     * @return mixed|null
-     */
-    public function create(array $data)
-    {
-        $model = $this->make();
-        $model->fill($data);
-
-        if ($model->save()) {
-            return $model;
-        }
-
-        return null;
-    }
-
-    /**
      * Delete the model.
      *
      * @param $model
@@ -188,7 +169,7 @@ class Repository
         } elseif (substr($name, 0, 8) == 'getOneBy') {
             $column = snake_case(substr($name, 8));
 
-            return call_user_func_array([$this->make(), 'where'], [$column, $arguments[0]])->find();
+            return call_user_func_array([$this->make(), 'where'], [$column, $arguments[0]])->first();
         }
     }
 
@@ -199,11 +180,15 @@ class Repository
      *
      * @throws \Exception
      */
-    public static function transaction(\Closure $closure = null)
+    public static function transaction($closure = null)
     {
         if (!self::$_transaction) {
             if ($closure) {
-                DB::transaction($closure);
+                if ($closure instanceof \Closure) {
+                    DB::transaction($closure);
+                } else {
+                    DB::connection($closure)->beginTransaction();
+                }
             } else {
                 DB::beginTransaction();
                 self::$_transaction = true;
@@ -216,12 +201,18 @@ class Repository
     /**
      * Rollback the current transaction.
      *
+     * @param null $connection
      * @throws \Exception
      */
-    public static function rollback()
+    public static function rollback($connection = null)
     {
         if (self::$_transaction) {
-            DB::rollback();
+            if ($connection) {
+                DB::connection($connection)->rollBack();
+            } else {
+                DB::rollBack();
+            }
+
             self::$_transaction = false;
         } else {
             throw new \Exception('Attempting to rollback outside of a transaction');
@@ -231,12 +222,18 @@ class Repository
     /**
      * Commit the current transaction.
      *
+     * @param null $connection
      * @throws \Exception
      */
-    public static function commit()
+    public static function commit($connection = null)
     {
         if (self::$_transaction) {
-            DB::commit();
+            if ($connection) {
+                DB::connection($connection)->commit();
+            } else {
+                DB::commit();
+            }
+
             self::$_transaction = false;
         } else {
             throw new \Exception('Attempting to commit outside of a transaction');
