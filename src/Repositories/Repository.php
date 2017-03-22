@@ -48,12 +48,12 @@ class Repository
     /**
      * @var string
      */
-    protected static $model;
+    protected $model;
 
     public function __construct($model = null)
     {
-        if ($model) {
-            self::$model = $model;
+        if (! is_null($model)) {
+            $this->model = $model;
         }
     }
 
@@ -62,7 +62,7 @@ class Repository
      */
     protected function make()
     {
-        return new self::$model;
+        return new $this->model;
     }
 
     /**
