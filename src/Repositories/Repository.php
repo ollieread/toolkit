@@ -1,7 +1,9 @@
 <?php
+
 namespace Ollieread\Toolkit\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -11,39 +13,10 @@ use Illuminate\Support\Facades\DB;
  */
 class Repository
 {
-
-    protected static $_transaction = false;
-
-    protected static $_cache = [];
-
     /**
-     * @param string $model
-     *
-     * @return \Ollieread\Toolkit\Repositories\Repository
+     * @var bool
      */
-    public static function for(string $model)
-    {
-        $mapping = config('toolkit.mapping');
-
-        if (array_key_exists($model, self::$_cache)) {
-            return new self::$_cache[$model];
-        }
-
-        if (array_key_exists($model, $mapping)) {
-            $repository = $mapping[$model];
-
-            if (class_exists($repository)) {
-                self::$_cache[$model] = $repository;
-                return new $repository;
-            }
-        }
-
-        /*
-         * If no repository class was found for the model, we'll return a generic one.
-         */
-
-        return new self($model);
-    }
+    protected static $_transaction = false;
 
     /**
      * @var string
@@ -60,7 +33,7 @@ class Repository
     /**
      * @return Model
      */
-    protected function make()
+    protected function make() : Model
     {
         return new $this->model;
     }
@@ -73,7 +46,7 @@ class Repository
      *
      * @return mixed
      */
-    protected function getId($model)
+    protected function getId($model) : int
     {
         return $model instanceof Model ? $model->getKey() : $model;
     }
@@ -102,14 +75,14 @@ class Repository
      *
      * @return mixed
      */
-    public function getBy()
+    public function getBy() : Collection
     {
         $model = $this->make();
 
         if (func_num_args() == 2) {
             list($column, $value) = func_get_args();
             $method = is_array($value) ? 'whereIn' : 'where';
-            $model = $this->$method($column, $value);
+            $model = $model->$method($column, $value);
         } elseif (func_num_args() == 1) {
             $columns = func_get_arg(0);
 
@@ -129,14 +102,14 @@ class Repository
      *
      * @return mixed
      */
-    public function getOneBy()
+    public function getOneBy() : Model
     {
         $model = $this->make();
 
         if (func_num_args() == 2) {
             list($column, $value) = func_get_args();
             $method = is_array($value) ? 'whereIn' : 'where';
-            $model = $this->$method($column, $value);
+            $model = $model->$method($column, $value);
         } elseif (func_num_args() == 1) {
             $columns = func_get_args();
 
@@ -184,7 +157,7 @@ class Repository
      */
     public static function transaction($closure = null)
     {
-        if (!self::$_transaction) {
+        if (! self::$_transaction) {
             if ($closure) {
                 if ($closure instanceof \Closure) {
                     DB::transaction($closure);
@@ -204,6 +177,7 @@ class Repository
      * Rollback the current transaction.
      *
      * @param null $connection
+     *
      * @throws \Exception
      */
     public static function rollback($connection = null)
@@ -225,6 +199,7 @@ class Repository
      * Commit the current transaction.
      *
      * @param null $connection
+     *
      * @throws \Exception
      */
     public static function commit($connection = null)

@@ -24,9 +24,6 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            __DIR__ . '/../config/toolkit.php' => config_path('toolkit.php')
-        ], 'config');
     }
 
     /**
