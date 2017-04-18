@@ -75,7 +75,7 @@ class Repository
      *
      * @return mixed
      */
-    public function getBy() : Collection
+    public function getBy() : ?Collection
     {
         $model = $this->make();
 
@@ -102,7 +102,7 @@ class Repository
      *
      * @return mixed
      */
-    public function getOneBy() : Model
+    public function getOneBy() : ?Model
     {
         $model = $this->make();
 
