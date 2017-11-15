@@ -11,29 +11,17 @@ use Illuminate\Support\Facades\DB;
  *
  * @package Ollieslab\Toolkit\Repositories
  */
-class Repository
+abstract class BaseRepository
 {
-    /**
-     * @var bool
-     */
-    protected static $_transaction = false;
-
     /**
      * @var string
      */
     protected $model;
 
-    public function __construct($model = null)
-    {
-        if (! is_null($model)) {
-            $this->model = $model;
-        }
-    }
-
     /**
      * @return Model
      */
-    protected function make() : Model
+    protected function make()
     {
         return new $this->model;
     }
@@ -149,71 +137,20 @@ class Repository
     }
 
     /**
-     * Start or perform a transaction.
+     * Perform a transaction.
      *
-     * @param \Closure|null $closure
+     * @param \Closure    $callback
+     * @param int         $attempts
+     * @param string|null $connection
      *
-     * @throws \Exception
+     * @return mixed
      */
-    public static function transaction($closure = null)
+    public static function transaction(\Closure $callback, int $attempts = 1, string $connection = null)
     {
-        if (! self::$_transaction) {
-            if ($closure) {
-                if ($closure instanceof \Closure) {
-                    DB::transaction($closure);
-                } else {
-                    DB::connection($closure)->beginTransaction();
-                }
-            } else {
-                DB::beginTransaction();
-                self::$_transaction = true;
-            }
+        if ($connection) {
+            return DB::connection($connection)->transaction($callback, $attempts);
         } else {
-            throw new \Exception('Attempting to start a transaction while already in a transaction');
-        }
-    }
-
-    /**
-     * Rollback the current transaction.
-     *
-     * @param null $connection
-     *
-     * @throws \Exception
-     */
-    public static function rollback($connection = null)
-    {
-        if (self::$_transaction) {
-            if ($connection) {
-                DB::connection($connection)->rollBack();
-            } else {
-                DB::rollBack();
-            }
-
-            self::$_transaction = false;
-        } else {
-            throw new \Exception('Attempting to rollback outside of a transaction');
-        }
-    }
-
-    /**
-     * Commit the current transaction.
-     *
-     * @param null $connection
-     *
-     * @throws \Exception
-     */
-    public static function commit($connection = null)
-    {
-        if (self::$_transaction) {
-            if ($connection) {
-                DB::connection($connection)->commit();
-            } else {
-                DB::commit();
-            }
-
-            self::$_transaction = false;
-        } else {
-            throw new \Exception('Attempting to commit outside of a transaction');
+            return DB::transaction($callback, $attempts);
         }
     }
 }
