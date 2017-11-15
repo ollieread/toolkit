@@ -4,7 +4,7 @@ namespace Ollieread\Toolkit\Eloquent\Enabled;
 trait EnabledTrait
 {
 
-    protected $enabled = 'active';
+    protected $enabled = 'enabled';
 
     public function getEnabledColumn()
     {
