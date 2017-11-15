@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Ollieread\MultitenancyOld\Auth\Guard\SessionGuard;
 use Ollieread\MultitenancyOld\Auth\Provider\DatabaseUserProvider;
 use Ollieread\MultitenancyOld\Auth\Provider\EloquentUserProvider;
-use Ollieread\Toolkit\Repositories\Repository;
+use Ollieread\Toolkit\Repositories\BaseRepository;
 
 /**
  * Version Service Provider
