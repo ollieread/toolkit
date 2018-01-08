@@ -35,7 +35,7 @@ class EnabledScope extends Scope
     protected function addEnabled(Builder $builder)
     {
         $builder->macro('enabled', function (Builder $builder) {
-            return $builder->where($builder->getModel()->getEnabledColumn(), '=', 0);
+            return $builder->where($builder->getModel()->getEnabledColumn(), '=', 1);
         });
     }
 

@@ -4,12 +4,14 @@ namespace Ollieread\Toolkit\Eloquent\Order;
 
 trait OrderTrait
 {
-
-    protected $order = 'order';
-
     public function getOrderColumn()
     {
-        return $this->order;
+        return 'order';
+    }
+
+    public function getOrderScope()
+    {
+        return null;
     }
 
     /**

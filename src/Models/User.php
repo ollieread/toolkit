@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
  * so that we don't have to manually hash. Everyone messes that up now and
  * again.
  *
- * @package Ollieslab\Toolkit\Models
+ * @package Ollieread\Toolkit\Models
  */
 abstract class User extends BaseUser
 {

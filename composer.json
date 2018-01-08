@@ -3,7 +3,7 @@
     "type": "library",
     "description": "",
     "license": "MIT",
-    "version": "v3.0.1",
+    "version": "v3.1",
     "authors": [
         {
             "name": "Ollie Read",
@@ -12,7 +12,7 @@
     ],
     "require": {
         "php": "^7.1",
-        "laravel/framework": "^5.4"
+        "laravel/framework": "^5.5"
     },
     "autoload": {
         "classmap": [],
