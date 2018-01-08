@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Base Repository
  *
- * @package Ollieslab\Toolkit\Repositories
+ * @package Ollieread\Toolkit\Repositories
  */
 abstract class BaseRepository
 {
@@ -27,8 +27,16 @@ abstract class BaseRepository
     }
 
     /**
-     * Accepts either the id or model. It's a safety method so that you can just pass argument in
-     * and receiver the id back.
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function query()
+    {
+        return $this->make()->newQuery();
+    }
+
+    /**
+     * Accepts either the id or model. It's a safety method so that you can just pass arguments in
+     * and receive the id back.
      *
      * @param $model
      *
@@ -40,11 +48,25 @@ abstract class BaseRepository
     }
 
     /**
+     * Accepts either the id or model. It's a safety method so that you can just pass arguments in
+     * and receive the model back.
+     *
+     * @param $model
+     *
+     * @return \Illuminate\Database\Eloquent\Model|mixed|null
+     */
+    public function getOneById($model)
+    {
+        return $model instanceof Model ? $model : $this->getOneBy('id', $model);
+    }
+
+    /**
      * Delete the model.
      *
      * @param $model
      *
      * @return bool|null
+     * @throws \Exception
      */
     public function delete($model)
     {
@@ -53,9 +75,9 @@ abstract class BaseRepository
         }
 
         $id = $model;
-        $model = $this->make();
+        $model = $this->query();
 
-        return $model->newQuery()->where($model->getKeyName(), $id)->delete();
+        return $model->where($model->getKeyName(), $id)->delete();
     }
 
     /**
@@ -65,7 +87,7 @@ abstract class BaseRepository
      */
     public function getBy() : ?Collection
     {
-        $model = $this->make();
+        $model = $this->query();
 
         if (func_num_args() == 2) {
             list($column, $value) = func_get_args();
@@ -92,7 +114,7 @@ abstract class BaseRepository
      */
     public function getOneBy() : ?Model
     {
-        $model = $this->make();
+        $model = $this->query();
 
         if (func_num_args() == 2) {
             list($column, $value) = func_get_args();
@@ -144,6 +166,7 @@ abstract class BaseRepository
      * @param string|null $connection
      *
      * @return mixed
+     * @throws \Exception|\Throwable
      */
     public static function transaction(\Closure $callback, int $attempts = 1, string $connection = null)
     {

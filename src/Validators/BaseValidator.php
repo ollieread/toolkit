@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
  *
  * Allows for simple model/object based validation.
  *
- * @package Ollieslab\Toolkit\Validators
+ * @package Ollieread\Toolkit\Validators
  */
 abstract class BaseValidator
 {
@@ -32,12 +32,12 @@ abstract class BaseValidator
     protected $model = null;
 
     /**
-     * @param array                               $data
+     * @param array                                    $data
      * @param \Illuminate\Database\Eloquent\Model|null $model
      */
     public function __construct(array $data, ?Model $model = null)
     {
-        $this->data      = $data;
+        $this->data  = $data;
         $this->model = $model;
     }
 
@@ -46,6 +46,7 @@ abstract class BaseValidator
      * @param \Illuminate\Database\Eloquent\Model|null $model
      *
      * @return static
+     * @throws \Illuminate\Validation\ValidationException
      */
     public static final function validate(array $data, ?Model $model = null)
     {

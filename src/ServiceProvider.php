@@ -12,7 +12,7 @@ use Ollieread\Toolkit\Repositories\BaseRepository;
 /**
  * Version Service Provider
  *
- * @package Ollieslab\Version
+ * @package Ollieread\Version
  */
 class ServiceProvider extends BaseServiceProvider
 {

@@ -11,6 +11,18 @@ class OrderScope extends Scope
         'MoveUp', 'MoveDown', 'MoveToTop', 'MoveToBottom'
     ];
 
+    public static function bootOrderScope()
+    {
+        /*
+         * Set the order for all newly created rows.
+         */
+        static::creating(function (Model $model) {
+            if ($model instanceof OrderContract) {
+                $model->order = $model->newQuery()->withoutGlobalScopes()->count();
+            }
+        });
+    }
+
     /**
      * Apply the scope to a given Eloquent query builder.
      *
