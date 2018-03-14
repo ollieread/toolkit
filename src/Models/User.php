@@ -21,7 +21,7 @@ abstract class User extends BaseUser
      *
      * @param string $value
      */
-    public function setPasswordAttribute(string $value)
+    public function setPasswordAttribute(string $value): void
     {
         $this->attributes['password'] = Hash::make($value);
     }

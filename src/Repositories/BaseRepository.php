@@ -2,6 +2,7 @@
 
 namespace Ollieread\Toolkit\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ abstract class BaseRepository
     /**
      * @return Model
      */
-    protected function make()
+    protected function make(): Model
     {
         return new $this->model;
     }
@@ -29,7 +30,7 @@ abstract class BaseRepository
     /**
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function query()
+    protected function query(): Builder
     {
         return $this->make()->newQuery();
     }
@@ -42,7 +43,7 @@ abstract class BaseRepository
      *
      * @return mixed
      */
-    protected function getId($model) : int
+    protected function getId($model): int
     {
         return $model instanceof Model ? $model->getKey() : $model;
     }
@@ -61,6 +62,36 @@ abstract class BaseRepository
     }
 
     /**
+     * Persist the model data.
+     *
+     * Pass in an array of input, and either an existing model or an id. Passing null to the
+     * second argument will create a new instance.
+     *
+     * @param array $input
+     * @param null  $model
+     *
+     * @return \Illuminate\Database\Eloquent\Model|mixed|null
+     */
+    public function persist(array $input, $model = null)
+    {
+        if ($model) {
+            $model = $this->getOneById($model);
+        } else {
+            $model = $this->make();
+        }
+
+        if ($model instanceof $this->model) {
+            $model->fill($input);
+
+            if ($model->save()) {
+                return $model;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Delete the model.
      *
      * @param $model
@@ -68,16 +99,18 @@ abstract class BaseRepository
      * @return bool|null
      * @throws \Exception
      */
-    public function delete($model)
+    public function delete($model): ?bool
     {
         if ($model instanceof Model) {
             return $model->delete();
         }
 
-        $id = $model;
-        $model = $this->query();
+        $id    = $model;
+        $model = $this->make();
 
-        return $model->where($model->getKeyName(), $id)->delete();
+        return $model->newQuery()
+            ->where($model->getKeyName(), $id)
+            ->delete();
     }
 
     /**
@@ -85,21 +118,21 @@ abstract class BaseRepository
      *
      * @return mixed
      */
-    public function getBy() : ?Collection
+    public function getBy(): ?Collection
     {
         $model = $this->query();
 
-        if (func_num_args() == 2) {
-            list($column, $value) = func_get_args();
-            $method = is_array($value) ? 'whereIn' : 'where';
-            $model = $model->$method($column, $value);
-        } elseif (func_num_args() == 1) {
+        if (\func_num_args() === 2) {
+            list($column, $value) = \func_get_args();
+            $method = \is_array($value) ? 'whereIn' : 'where';
+            $model  = $model->$method($column, $value);
+        } elseif (\func_num_args() === 1) {
             $columns = func_get_arg(0);
 
-            if (is_array($columns)) {
+            if (\is_array($columns)) {
                 foreach ($columns as $column => $value) {
-                    $method = is_array($value) ? 'whereIn' : 'where';
-                    $model = $model->$method($column, $value);
+                    $method = \is_array($value) ? 'whereIn' : 'where';
+                    $model  = $model->$method($column, $value);
                 }
             }
         }
@@ -112,21 +145,21 @@ abstract class BaseRepository
      *
      * @return mixed
      */
-    public function getOneBy() : ?Model
+    public function getOneBy(): ?Model
     {
         $model = $this->query();
 
-        if (func_num_args() == 2) {
-            list($column, $value) = func_get_args();
-            $method = is_array($value) ? 'whereIn' : 'where';
-            $model = $model->$method($column, $value);
-        } elseif (func_num_args() == 1) {
-            $columns = func_get_args();
+        if (\func_num_args() === 2) {
+            list($column, $value) = \func_get_args();
+            $method = \is_array($value) ? 'whereIn' : 'where';
+            $model  = $model->$method($column, $value);
+        } elseif (\func_num_args() === 1) {
+            $columns = \func_get_args();
 
-            if (is_array($columns)) {
+            if (\is_array($columns)) {
                 foreach ($columns as $column => $value) {
-                    $method = is_array($value) ? 'whereIn' : 'where';
-                    $model = $model->$method($column, $value);
+                    $method = \is_array($value) ? 'whereIn' : 'where';
+                    $model  = $model->$method($column, $value);
                 }
             }
         }
@@ -137,24 +170,26 @@ abstract class BaseRepository
     /**
      * Magic method handling for dynamic functions such as getByAddress() or getOneById().
      *
-     * @param       $name
-     * @param array $arguments
+     * @param string $name
+     * @param array  $arguments
      *
      * @return \Illuminate\Database\Eloquent\Collection|mixed|null
      */
-    function __call($name, $arguments = [])
+    public function __call(string $name, array $arguments = [])
     {
-        if (count($arguments) > 1) {
+        if (\count($arguments) > 1) {
             // TODO: Should probably throw an exception here
             return null;
         }
 
-        if (substr($name, 0, 5) == 'getBy') {
+        if (0 === strpos($name, 'getBy')) {
             return $this->getBy(snake_case(substr($name, 5)), $arguments[0]);
-        } elseif (substr($name, 0, 8) == 'getOneBy') {
+        }
+
+        if (0 === strpos($name, 'getOneBy')) {
             $column = snake_case(substr($name, 8));
 
-            return call_user_func_array([$this->make(), 'where'], [$column, $arguments[0]])->first();
+            return \call_user_func([$this->make(), 'where'], $column, $arguments[0])->first();
         }
     }
 
@@ -172,8 +207,8 @@ abstract class BaseRepository
     {
         if ($connection) {
             return DB::connection($connection)->transaction($callback, $attempts);
-        } else {
-            return DB::transaction($callback, $attempts);
         }
+
+        return DB::transaction($callback, $attempts);
     }
 }

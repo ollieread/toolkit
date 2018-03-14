@@ -29,7 +29,7 @@ abstract class BaseValidator
     /**
      * @var \Illuminate\Database\Eloquent\Model|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * @param array                                    $data
@@ -48,7 +48,7 @@ abstract class BaseValidator
      * @return static
      * @throws \Illuminate\Validation\ValidationException
      */
-    public static final function validate(array $data, ?Model $model = null)
+    final public static function validate(array $data, ?Model $model = null)
     {
         $validator = new static($data, $model);
         $validator->fire();
@@ -61,7 +61,7 @@ abstract class BaseValidator
      *
      * @return array
      */
-    public abstract function getRules(): array;
+    abstract public function getRules(): array;
 
     /**
      * Returns the data.
@@ -90,7 +90,7 @@ abstract class BaseValidator
      *
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public final function validator(): Validator
+    final public function validator(): Validator
     {
         return $this->validator;
     }
@@ -101,7 +101,7 @@ abstract class BaseValidator
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function failed()
+    protected function failed(): void
     {
         throw new ValidationException($this->validator);
     }
@@ -112,7 +112,7 @@ abstract class BaseValidator
      * @return bool
      * @throws ValidationException
      */
-    private function fire()
+    private function fire(): bool
     {
         $this->validator = app(Factory::class)->make($this->getData(), $this->getRules(), $this->getMessages());
 

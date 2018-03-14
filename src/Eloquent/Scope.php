@@ -20,7 +20,7 @@ abstract class Scope implements Contract
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    public function extend(Builder $builder)
+    public function extend(Builder $builder): void
     {
         foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);

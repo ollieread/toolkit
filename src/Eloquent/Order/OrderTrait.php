@@ -4,12 +4,12 @@ namespace Ollieread\Toolkit\Eloquent\Order;
 
 trait OrderTrait
 {
-    public function getOrderColumn()
+    public function getOrderColumn(): string
     {
         return 'order';
     }
 
-    public function getOrderScope()
+    public function getOrderScope(): void
     {
         return null;
     }
@@ -19,7 +19,7 @@ trait OrderTrait
      *
      * @return void
      */
-    public static function bootOrderTrait()
+    public static function bootOrderTrait(): void
     {
         static::addGlobalScope(new OrderScope());
     }
