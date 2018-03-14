@@ -22,7 +22,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
     }
 
@@ -31,11 +31,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
-    }
-
-    public function registerAuth()
+    public function register(): void
     {
     }
 }

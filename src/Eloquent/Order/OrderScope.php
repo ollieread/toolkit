@@ -1,4 +1,5 @@
 <?php
+
 namespace Ollieread\Toolkit\Eloquent\Order;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -8,10 +9,10 @@ use Ollieread\Toolkit\Eloquent\Scope;
 class OrderScope extends Scope
 {
     protected $extensions = [
-        'MoveUp', 'MoveDown', 'MoveToTop', 'MoveToBottom'
+        'MoveUp', 'MoveDown', 'MoveToTop', 'MoveToBottom',
     ];
 
-    public static function bootOrderScope()
+    public static function bootOrderScope(): void
     {
         /*
          * Set the order for all newly created rows.
@@ -27,10 +28,11 @@ class OrderScope extends Scope
      * Apply the scope to a given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model   $model
+     *
      * @return void
      */
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): void
     {
         if ($model instanceof OrderContract) {
             $builder->getQuery()->unionOrders = [];
@@ -38,44 +40,47 @@ class OrderScope extends Scope
         }
     }
 
-    protected function addMoveUp(Builder $builder)
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     */
+    protected function addMoveUp(Builder $builder): void
     {
-        $builder->macro('moveUp', function (Builder $builder) {
+        $builder::macro('moveUp', function (Builder $builder) {
             $orderColumn = $builder->getModel()->getOrderColumn();
-            $newOrder = max(0, $builder->getModel()->getAttribute($orderColumn) - 1);
+            $newOrder    = max(0, $builder->getModel()->getAttribute($orderColumn) - 1);
             $builder->where($orderColumn, '=', $newOrder)->where('id', '!=', $builder->getModel()->id)->increment($orderColumn);
             $builder->getModel()->setAttribute($orderColumn, $newOrder)->save();
         });
     }
 
-    protected function addMoveDown(Builder $builder)
+    protected function addMoveDown(Builder $builder): void
     {
-        $builder->macro('moveDown', function (Builder $builder) {
+        $builder::macro('moveDown', function (Builder $builder) {
             $orderColumn = $builder->getModel()->getOrderColumn();
-            $maxOrder = $builder->withoutGlobalScope($this)->count() - 1;
-            $newOrder = min($maxOrder, $builder->getModel()->getAttribute($orderColumn) + 1);
+            $maxOrder    = $builder->withoutGlobalScope($this)->count() - 1;
+            $newOrder    = min($maxOrder, $builder->getModel()->getAttribute($orderColumn) + 1);
             $builder->where($orderColumn, '=', $newOrder)->where('id', '!=', $builder->getModel()->id)->decrement($orderColumn);
             $builder->getModel()->setAttribute($orderColumn, $newOrder)->save();
         });
     }
 
-    protected function addMoveToTop(Builder $builder)
+    protected function addMoveToTop(Builder $builder): void
     {
-        $builder->macro('moveToTop', function (Builder $builder) {
-            $orderColumn = $builder->getModel()->getOrderColumn();
+        $builder::macro('moveToTop', function (Builder $builder) {
+            $orderColumn  = $builder->getModel()->getOrderColumn();
             $currentOrder = $builder->getModel()->getAttribute($orderColumn);
-            $newOrder = 0;
+            $newOrder     = 0;
             $builder->where($orderColumn, '<=', $currentOrder)->where('id', '!=', $builder->getModel()->id)->increment($orderColumn);
             $builder->getModel()->setAttribute($orderColumn, $newOrder)->save();
         });
     }
 
-    protected function addMoveToBottom(Builder $builder)
+    protected function addMoveToBottom(Builder $builder): void
     {
-        $builder->macro('moveToBottom', function (Builder $builder) {
-            $orderColumn = $builder->getModel()->getOrderColumn();
+        $builder::macro('moveToBottom', function (Builder $builder) {
+            $orderColumn  = $builder->getModel()->getOrderColumn();
             $currentOrder = $builder->getModel()->getAttribute($orderColumn);
-            $newOrder = $builder->withoutGlobalScope($this)->count() - 1;
+            $newOrder     = $builder->withoutGlobalScope($this)->count() - 1;
             $builder->where($orderColumn, '>=', $currentOrder)->where('id', '!=', $builder->getModel()->id)->decrement($orderColumn);
             $builder->getModel()->setAttribute($orderColumn, $newOrder)->save();
         });
