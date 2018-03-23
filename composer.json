@@ -19,5 +19,12 @@
         "psr-4": {
             "Ollieread\\Toolkit\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ollieread\\Toolkit\\ServiceProvider"
+            ]
+        }
     }
 }
