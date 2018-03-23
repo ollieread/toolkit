@@ -1,13 +1,10 @@
 <?php
+
 namespace Ollieread\Toolkit;
 
-use Illuminate\Auth\TokenGuard;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Ollieread\MultitenancyOld\Auth\Guard\SessionGuard;
-use Ollieread\MultitenancyOld\Auth\Provider\DatabaseUserProvider;
-use Ollieread\MultitenancyOld\Auth\Provider\EloquentUserProvider;
-use Ollieread\Toolkit\Repositories\BaseRepository;
+use Ollieread\Toolkit\Query\MysqlGrammar;
 
 /**
  * Version Service Provider
@@ -24,6 +21,16 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot(): void
     {
+        Builder::macro('recursive', function (string $name, \Closure $closure) {
+            $this->bindings['recursive'] = [];
+            $recursive                   = $this->newQuery();
+            call_user_func($closure, $recursive);
+            $this->recursives[] = [$name, $recursive];
+            $this->addBinding($recursive->getBindings(), 'recursive');
+            $this->grammar = new MysqlGrammar();
+
+            return $this;
+        });
     }
 
     /**
