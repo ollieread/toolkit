@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/ollieread/laravel-toolkit/v/stable.png)](https://packagist.org/packages/ollieread/laravel-toolkit) [![Total Downloads](https://poser.pugx.org/ollieread/laravel-toolkit/downloads.png)](https://packagist.org/packages/ollieread/laravel-toolkit) [![Latest Unstable Version](https://poser.pugx.org/ollieread/laravel-toolkit/v/unstable.png)](https://packagist.org/packages/ollieread/laravel-toolkit) [![License](https://poser.pugx.org/ollieread/laravel-toolkit/license.png)](https://packagist.org/packages/ollieread/laravel-toolkit)
 
-- **Laravel**: 5.5, 5.6
+- **Laravel**: 5.5
 - **PHP**: 7.1+
 - **Author**: Ollie Read 
 - **Author Homepage**: http://ollieread.com
