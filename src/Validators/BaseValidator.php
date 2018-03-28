@@ -4,7 +4,6 @@ namespace Ollieread\Toolkit\Validators;
 
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -27,28 +26,28 @@ abstract class BaseValidator
     protected $data = [];
 
     /**
-     * @var \Illuminate\Database\Eloquent\Model|null
+     * @var object|null
      */
     protected $model;
 
     /**
-     * @param array                                    $data
-     * @param \Illuminate\Database\Eloquent\Model|null $model
+     * @param array       $data
+     * @param object|null $model
      */
-    public function __construct(array $data, ?Model $model = null)
+    public function __construct(array $data, ?object $model = null)
     {
         $this->data  = $data;
         $this->model = $model;
     }
 
     /**
-     * @param array                                    $data
-     * @param \Illuminate\Database\Eloquent\Model|null $model
+     * @param array       $data
+     * @param object|null $model
      *
      * @return static
      * @throws \Illuminate\Validation\ValidationException
      */
-    final public static function validate(array $data, ?Model $model = null)
+    final public static function validate(array $data, ?object $model = null)
     {
         $validator = new static($data, $model);
         $validator->fire();
